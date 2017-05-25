@@ -186,6 +186,7 @@ will most probably support it at least partially.
   - Proxmox VE 3.x (based on Debian 7.x)
   - Zentyal Server 3.4 (based on Ubuntu 13.10)
   - Zentyal Server 4.1 (based on Ubuntu 14.04 LTS)
+  - Zentyal Server 5.0 (based on Ubuntu 16.04 LTS)
 
 - RHEL and direct clones:
   - Red Hat Enterprise Linux 5.x
@@ -202,6 +203,10 @@ will most probably support it at least partially.
   - Elastix 2.5 (based on CentOS 5.x)
   - Elastix 4.0 (based on CentOS 7.x)
   - Elastix MT 3.0 (based on CentOS 6.x)
+
+- hardware appliances:
+  - Raspbian 8.x (Jessie) on Raspberry Pi
+  - Debian all versions listed above since 6.x (Squeeze) on QNAP with ARM CPU
 
 - other systems:
   - FreeBSD 9.x
