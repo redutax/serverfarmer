@@ -44,7 +44,7 @@ cacti_ssh_port() {
 }
 
 heartbeat_url() {
-	echo "https://serwer1598662.home.pl/heartbeat.php"
+	echo "http://heartbeat.tomaszklim.pl/cgi-bin/heartbeat-local.cgi"
 }
 
 connectivity_check_url() {
