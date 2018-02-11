@@ -3,7 +3,13 @@
 . /opt/farm/scripts/functions.dialog
 
 
-if [ ! -f /etc/farmconfig ]; then
+if [ ! -f /etc/farmconfig ] && [ ! -f /etc/config/farmconfig ]; then
+
+	if [ ! -x /bin/git ] && [ ! -x /opt/bin/git ] && [ ! -x /usr/bin/git ] && [ ! -x /usr/local/bin/git ] && [ -x /opt/bin/ipkg ]; then
+		echo "attempting to install Git"
+		/opt/bin/ipkg install git
+		ln -s /usr/bin/git /bin/git
+	fi
 
 	if [ ! -d /opt/farm/ext/system ]; then
 		git clone "`extension_repositories`/sf-system" /opt/farm/ext/system
@@ -32,6 +38,11 @@ if [ ! -f /etc/farmconfig ]; then
 
 		if [ "$SYSLOG" != "true" ]; then
 			SYSLOG="`input \"enter central syslog hostname\" syslog.$INTERNAL`"
+		fi
+
+		if [ "$OSTYPE" = "qnap" ]; then
+			touch /etc/config/farmconfig
+			ln -s /etc/config/farmconfig /etc/farmconfig
 		fi
 
 		echo "HOST=$HOST" >/etc/farmconfig
