@@ -7,26 +7,39 @@ into a single managed platform.
 As of 2018, Server Farmer has over 10 years of history of managing production
 servers (which is longer than in competing Chef framework), including over
 3 years of being successful open source project. It was used to manage the
-infrastructure for over 160 customers, consisted of over 650 physical/virtual
+infrastructure for over 170 customers, consisted of over 700 physical/virtual
 servers and containers, located in multiple data centers, in almost 10 major
-cities in Poland, at least 2 cities in Germany, and over 140 cloud instances
-hosted by Amazon Web Services, Microsoft Azure and Rackspace Cloud, physically
-located across the whole world.
+cities in Poland, at least 2 cities in Germany, and over 200 cloud instances
+hosted by Amazon Web Services, Microsoft Azure, Google Cloud Platform, Hetzner
+Cloud and Rackspace Cloud, physically located across the whole world.
 
 ## Documentation
 
-You can find a lot more information at http://serverfarmer.org/ project page:
+You can find a lot more information at http://serverfarmer.org/ project page and in extension repositories:
 
-1. [Main page](http://serverfarmer.org/)
+##### less technical
+
+1. [Home page](http://serverfarmer.org/)
 2. [Business overview (for non-technical users)](http://serverfarmer.org/basics.html)
-3. [Key concepts](http://serverfarmer.org/key-concepts.html)
-4. [Monitoring features](http://serverfarmer.org/monitoring.html)
-5. [Project history](http://serverfarmer.org/history.html)
-6. [Getting started](http://serverfarmer.org/getting-started.html)
-7. [Cloud platforms](http://serverfarmer.org/cloud-platforms.html)
-8. [Cloud integration](http://serverfarmer.org/cloud-integration.html)
-9. [Configuration settings](http://serverfarmer.org/configuration.html)
-10. [List of extensions](http://serverfarmer.org/extensions.html)
+3. [Project history](http://serverfarmer.org/history.html)
+
+##### for the beginners
+
+1. [Getting started](http://serverfarmer.org/getting-started.html)
+2. [Configuration settings](http://serverfarmer.org/configuration.html)
+3. [gpg/ssh key configuration details](https://github.com/serverfarmer/sf-keys)
+4. [List of extensions](http://serverfarmer.org/extensions.html)
+
+##### more advanced
+
+1. [Farm management](https://github.com/serverfarmer/sf-farm-manager)
+2. [Monitoring features](http://serverfarmer.org/monitoring.html)
+3. [Backup architecture (local part)](https://github.com/serverfarmer/sf-backup)
+4. [Backup architecture (storage part)](https://github.com/serverfarmer/sf-backup-collector)
+
+##### DNS / DHCP management
+
+1. [ZoneMaster tool](https://github.com/tomaszklim/zonemaster)
 
 If you have any technical or non-technical questions about Server Farmer, for
 which you can't find an answer on the project home page, feel free to write
@@ -85,7 +98,7 @@ Server Farmer with Ansible, whichever better fits your needs.
 
 ## How to install Server Farmer on your first server
 
-Server Farmer consists of over 60 Git repositories. But don't worry, you will
+Server Farmer consists of over 80 Git repositories. But don't worry, you will
 need to fork only 2 of them (this one and `sf-keys`), and start with editing
 just one small file: `scripts/functions.custom`.
 
@@ -101,40 +114,53 @@ Then run `setup.sh` script and just follow the simple on-screen instructions:
 /opt/farm/setup.sh
 ```
 
-## How to deploy Server Farmer into cloud
+## Integration with cloud
 
-Server Farmer supports the following public cloud providers:
+Server Farmer uses [Polynimbus](https://github.com/polynimbus/polynimbus)
+multi-cloud infrastructure management tool to launch and manage cloud instances,
+and `sf-farm-provisioning` extension to provision them.
 
-- Amazon EC2
+It supports:
+
+- Alibaba Cloud
+- Amazon Web Services
 - Beyond e24cloud.com
-- Google Compute Engine
+- Google Cloud Platform
 - Hetzner Cloud (and also Hetzner "classic" dedicated servers)
 - Microsoft Azure
 - Rackspace Cloud
 - any cloud service based on OpenStack (including public, private and hybrid clouds)
 
-([see the full manual](http://serverfarmer.org/cloud-integration.html))
+### How to deploy Server Farmer into cloud
 
 Initial setup:
 
-- choose a server for the farm manager role (no special requirements, except that all management extensions are tested mainly on Ubuntu 14.04 LTS, 16.04 LTS and 18.04 LTS)
-- install Server Farmer on it, along with sf-farm-manager and sf-farm-provisioning extensions (preferably also sf-backup-collector and sf-farm-inspector)
-- install Cloud Farmer on it and configure it, providing your cloud API keys and other details (interactively)
+- choose a server for the *farm manager* role (no special requirements, except that all management extensions are tested mainly on Ubuntu 14.04 LTS, 16.04 LTS and 18.04 LTS)
+- install Server Farmer on it ([basic installation](http://serverfarmer.org/getting-started.html) is enough)
+- install Polynimbus on it and configure it, providing your cloud API keys and other details (interactively):
 
 ```
-git clone https://github.com/serverfarmer/cloudfarmer /opt/cloud
+git clone https://github.com/polynimbus/polynimbus /opt/polynimbus
+/opt/polynimbus/install.sh
+/opt/polynimbus/api/v1/account/setup.sh aws myaccount
 ```
 
-- creating new cloud instance
+Launch new cloud instance:
 
 ```
-/opt/cloud/create.sh ec2 test_key1 m4.xlarge
+/opt/polynimbus/api/v1/instance/launch.sh aws myaccount test_key1 m5.xlarge
 ```
 
-- deploy Server Farmer on created instance
+Install Server Farmer on new instance:
 
 ```
-sf-provision ec2-54-123-45-67.compute-1.amazonaws.com /etc/local/.ssh/id_ec2_test_key1 test_profile
+sf-provision ec2-54-123-45-67.compute-1.amazonaws.com /etc/polynimbus/ssh/id_aws_test_key1 test_profile
+```
+
+List cloud instances:
+
+```
+/opt/polynimbus/api/v1/instance/list.sh aws myaccount
 ```
 
 ## Compatible operating systems
