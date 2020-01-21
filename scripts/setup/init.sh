@@ -11,19 +11,20 @@ initial_git_clone() {
 }
 
 
+/opt/farm/scripts/git/bootstrap.sh
+
+initial_git_clone system
+initial_git_clone repos
+initial_git_clone packages
+initial_git_clone farm-roles
+initial_git_clone passwd-utils
+
+mkdir -p   /etc/local/.config /etc/local/.ssh
+chmod 0700 /etc/local/.config /etc/local/.ssh
+chmod 0711 /etc/local
+
+
 if [ ! -f /etc/farmconfig ] && [ ! -f /etc/config/farmconfig ]; then
-
-	if [ ! -x /bin/git ] && [ ! -x /opt/bin/git ] && [ ! -x /usr/bin/git ] && [ ! -x /usr/local/bin/git ] && [ -x /opt/bin/ipkg ]; then
-		echo "attempting to install Git"
-		/opt/bin/ipkg install git
-		ln -s /usr/bin/git /bin/git
-	fi
-
-	initial_git_clone system
-	initial_git_clone repos
-	initial_git_clone packages
-	initial_git_clone farm-roles
-	initial_git_clone passwd-utils
 
 	OSDET=`/opt/farm/ext/system/detect-system-version.sh`
 	OSTYPE=`/opt/farm/ext/system/detect-system-version.sh -type`
@@ -59,25 +60,10 @@ if [ ! -f /etc/farmconfig ] && [ ! -f /etc/config/farmconfig ]; then
 		echo "SMTP=$SMTP" >>/etc/farmconfig
 		echo "SYSLOG=$SYSLOG" >>/etc/farmconfig
 
-		mkdir -p   /etc/local/.config /etc/local/.ssh
-		chmod 0700 /etc/local/.config /etc/local/.ssh
-		chmod 0711 /etc/local
-
 		/opt/farm/ext/packages/special/bash.sh
 		/opt/farm/ext/system/set-hostname.sh $HOST
 		/opt/farm/ext/passwd-utils/create-group.sh newrelic 130  # common group for monitoring extensions
-
-		if [ "$REGENERATE_HOST_KEYS" != "" ]; then
-			if [ "$OSTYPE" = "debian" ]; then
-				rm -f /etc/ssh/ssh_host_*
-				dpkg-reconfigure openssh-server
-			elif [ -x /usr/sbin/sshd-keygen ]; then
-				rm -f /etc/ssh/ssh_host_*
-				/usr/sbin/sshd-keygen   # RHEL 7.x
-			else
-				echo "unable to regenerate host ssh keys, skipping this step"
-			fi
-		fi
+		/opt/farm/ext/packages/special/regenerate-ssh-host-keys.sh
 
 		echo "initial configuration done, now run /opt/farm/setup.sh once again"
 	else
